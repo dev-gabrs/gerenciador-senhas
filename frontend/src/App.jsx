@@ -60,63 +60,77 @@ async function handleUnlock() {
     <div>
       <h1>Gerenciador de Senhas</h1>
 
-
-      <div>
-      <label>
-        Tamanho: {length}
-        <input
-          type="range"
-          min="8"
-          max="48"
-          value={length}
-          onChange={(e) => setLength(Number(e.target.value))}
-        />
-      </label>
-      </div>
-
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            checked={useUpper}
-            onChange={(e) => setUseUpper(e.target.checked)}
+      {!vaultKey && (
+        <div>
+          <input  
+              type="password"
+              placeholder="Senha mestra"
+              value={masterPassword}
+              onChange={(e) => setMasterPassword(e.target.value)}
           />
-          Letras Maiúsculas
-        </label>
+          <button onClick={handleUnlock}>Entrar no cofre</button>
+        </div>
+      )}
 
-        <label>
-          <input
-            type="checkbox"
-            checked={useLower}
-            onChange={(e) => setUseLower(e.target.checked)}
-          />
-          Letras Minúsculas
-        </label>
+      {vaultKey && (
+        <div>
+          <div>
+            <label>
+              Tamanho: {length}
+              <input
+                type="range"
+                min="8"
+                max="48"
+                value={length}
+               onChange={(e) => setLength(Number(e.target.value))}
+              />
+            </label>
+          </div>
+
+          <div>
+            <label>
+              <input
+              type="checkbox"
+              checked={useUpper}
+              onChange={(e) => setUseUpper(e.target.checked)}
+              />
+              Letras Maiúsculas
+            </label>
+
+            <label>
+              <input
+              type="checkbox"
+              checked={useLower}
+              onChange={(e) => setUseLower(e.target.checked)}
+              />
+              Letras Minúsculas
+            </label>
   
-        <label>
-          <input
-            type="checkbox"
-            checked={useNumbers}
-            onChange={(e) => setUseNumbers(e.target.checked)}
-          />
-          Números
-        </label>
+            <label>
+              <input
+              type="checkbox"
+              checked={useNumbers}
+              onChange={(e) => setUseNumbers(e.target.checked)}
+              />
+              Números
+            </label>
 
-        <label>
-          <input
-            type="checkbox"
-            checked={useSymbols}
-            onChange={(e) => setUseSymbols(e.target.checked)}
-          />
-          Símbolos
-        </label>
-      </div>  
+            <label>
+              <input
+              type="checkbox"
+              checked={useSymbols}
+              onChange={(e) => setUseSymbols(e.target.checked)}
+              />
+              Símbolos
+            </label>
+          </div>  
 
-      <button onClick={generatePassword}>Gerar Senha</button>
-
-      <p>{password}</p>
+          <button onClick={generatePassword}>Gerar Senha</button>
+          <p>{password}</p>
+        </div>
+      )}
     </div>
   );
 }
 
-export default App
+export default App;

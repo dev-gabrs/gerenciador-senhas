@@ -9,21 +9,22 @@ export async function deriveKey(masterPassword, saltBase64) {
         false,
         ["deriveKey"]
     );
-}
+
 
     return crypto.subtle.deriveKey(
         { name: "PBKDF2", salt, iterations: 250000, hash: "SHA-256" },
         baseKey,
         { name: "AES-GCM", length: 256 },
-        false
+        false,
         ["encrypt", "decrypt"]
     );
+}
 
     function bufTob64(buf) {
         return btoa(String.fromCharCode(...new Uint8Array(buf)));
     }
 
-    function bufTob64(b64) {
+    function b64ToBuf(b64) {
         return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
     }
 
@@ -42,7 +43,7 @@ export async function deriveKey(masterPassword, saltBase64) {
     }
 
     export async function decryptText(key, cipherText) {
-        const [ivB64, cipherB64] = packed.split(".");
+        const [ivB64, cipherB64] = cipherText.split(".");
         const iv = b64ToBuf(ivB64);
         const cipherBuffer = b64ToBuf(cipherB64);
 
