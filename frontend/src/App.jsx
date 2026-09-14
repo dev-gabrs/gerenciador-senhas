@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { deriveKey, encryptText, randomSaltBase64 } from "./crypto";
+import { useState, useEffect } from "react";
+import { deriveKey, encryptText, decryptText, randomSaltBase64 } from "./crypto";
 
 function App() {
   const [length, setLength] = useState(16);
@@ -12,6 +12,13 @@ function App() {
   const [vaultKey, setVaultKey] = useState(null);
   const [siteInput, setSiteInput] = useState("");
   const [usernameInput, setUsernameInput] = useState("");
+  const [entries, setEntries] = useState([]);
+
+useEffect(() => {
+    if (vaultKey) {
+      loadEntries();
+    }
+  }, [vaultKey]);
 
 function generatePassword() {
   const sets = {
@@ -21,7 +28,7 @@ function generatePassword() {
     symbol: "!@#$%^&*()_+[]{}|;:,.<>?",
   };
 
-  let pool = "";
+let pool = "";
   if (useUpper) pool += sets.upper;
   if (useLower) pool += sets.lower;
   if (useNumbers) pool += sets.number;
@@ -78,10 +85,28 @@ async function handleSave() {
     alert("Senha salva com sucesso!");
     setSiteInput("");
     setUsernameInput("");
+    loadEntries();
   } else {
     alert("Erro ao salvar a senha");
   }
 }
+
+async function loadEntries() {
+  const response = await fetch("http://127.0.0.1:5000/api/vault");
+  const data = await response.json();
+
+  const decrypted = await Promise.all(
+    data.map(async (item) => ({
+      id: item.id,
+      site: item.site,
+      username: item.username,
+      password: await decryptText(vaultKey, item.encrypted_password),
+    }))
+  );
+
+  setEntries(decrypted);
+}
+
 
 return (
   <div>
@@ -175,11 +200,23 @@ return (
             onChange={(e) => setPassword(e.target.value)}
           />
           <button onClick={handleSave}>Salvar Senha</button>
-        </div>  
+          </div>
 
+           <h2>Senhas Salvas</h2>
+
+        {entries.length === 0 && <p>Nenhuma senha salva ainda.</p>}
+
+        {entries.map((entry) => (
+          <div key={entry.id}>
+            <strong>{entry.site}</strong>
+            {entry.username && <span> - {entry.username}</span>}
+            <p>{entry.password}</p>
+          </div>
+        ))}
       </div>
     )}
-  </div>
-)}
+  </div> 
+  );
+}
 
 export default App;
