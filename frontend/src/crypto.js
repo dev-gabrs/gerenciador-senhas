@@ -20,7 +20,7 @@ export async function deriveKey(masterPassword, saltBase64) {
     );
 }
 
-    function bufTob64(buf) {
+    function bufToB64(buf) {
         return btoa(String.fromCharCode(...new Uint8Array(buf)));
     }
 

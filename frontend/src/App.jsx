@@ -56,81 +56,130 @@ async function handleUnlock() {
   setVaultKey(key);
 }
 
-  return (
-    <div>
-      <h1>Gerenciador de Senhas</h1>
+async function handleSave() {
+  if (!password || password === "Selecione ao menos uma opção") {
+    alert("Gere uma senha primeiro");
+    return;
+  }
 
-      {!vaultKey && (
-        <div>
-          <input  
-              type="password"
-              placeholder="Senha mestra"
-              value={masterPassword}
-              onChange={(e) => setMasterPassword(e.target.value)}
-          />
-          <button onClick={handleUnlock}>Entrar no cofre</button>
-        </div>
-      )}
+  const encryptedPassword = await encryptText(vaultKey, password);
 
-      {vaultKey && (
-        <div>
-          <div>
-            <label>
-              Tamanho: {length}
-              <input
-                type="range"
-                min="8"
-                max="48"
-                value={length}
-               onChange={(e) => setLength(Number(e.target.value))}
-              />
-            </label>
-          </div>
+  const response = await fetch("http://127.0.0.1:5000/api/vault", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      site: siteInput,
+      username: usernameInput,
+      encrypted_password: encryptedPassword,
+    }),
+  });
 
-          <div>
-            <label>
-              <input
-              type="checkbox"
-              checked={useUpper}
-              onChange={(e) => setUseUpper(e.target.checked)}
-              />
-              Letras Maiúsculas
-            </label>
-
-            <label>
-              <input
-              type="checkbox"
-              checked={useLower}
-              onChange={(e) => setUseLower(e.target.checked)}
-              />
-              Letras Minúsculas
-            </label>
-  
-            <label>
-              <input
-              type="checkbox"
-              checked={useNumbers}
-              onChange={(e) => setUseNumbers(e.target.checked)}
-              />
-              Números
-            </label>
-
-            <label>
-              <input
-              type="checkbox"
-              checked={useSymbols}
-              onChange={(e) => setUseSymbols(e.target.checked)}
-              />
-              Símbolos
-            </label>
-          </div>  
-
-          <button onClick={generatePassword}>Gerar Senha</button>
-          <p>{password}</p>
-        </div>
-      )}
-    </div>
-  );
+  if (response.ok) {
+    alert("Senha salva com sucesso!");
+    setSiteInput("");
+    setUsernameInput("");
+  } else {
+    alert("Erro ao salvar a senha");
+  }
 }
+
+return (
+  <div>
+    <h1>Gerenciador de Senhas</h1>
+
+    {!vaultKey && (
+      <div>
+        <input  
+            type="password"
+            placeholder="Senha mestra"
+            value={masterPassword}
+            onChange={(e) => setMasterPassword(e.target.value)}
+        />
+        <button onClick={handleUnlock}>Entrar no cofre</button>
+      </div>
+    )}
+
+    {vaultKey && (
+      <div>
+        <div>
+          <label>
+            Tamanho: {length}
+            <input
+              type="range"
+              min="8"
+              max="48"
+              value={length}
+              onChange={(e) => setLength(Number(e.target.value))}
+            />
+          </label>
+        </div>
+
+        <div>
+          <label>
+            <input
+            type="checkbox"
+            checked={useUpper}
+            onChange={(e) => setUseUpper(e.target.checked)}
+            />
+            Letras Maiúsculas
+          </label>
+
+          <label>
+            <input
+            type="checkbox"
+            checked={useLower}
+            onChange={(e) => setUseLower(e.target.checked)}
+            />
+            Letras Minúsculas
+          </label>
+  
+          <label>
+            <input
+            type="checkbox"
+            checked={useNumbers}
+            onChange={(e) => setUseNumbers(e.target.checked)}
+            />
+            Números
+          </label>
+
+          <label>
+            <input
+            type="checkbox"
+            checked={useSymbols}
+            onChange={(e) => setUseSymbols(e.target.checked)}
+            />
+            Símbolos
+          </label>
+        </div>  
+
+        <button onClick={generatePassword}>Gerar Senha</button>
+        <p>{password}</p>
+
+        <div>
+          <input
+            type="text"
+            placeholder="Site (ex: github.com)"
+            value={siteInput}
+            onChange={(e) => setSiteInput(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Nome de usuário/e-mail"
+            value={usernameInput}
+            onChange={(e) => setUsernameInput(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Senha"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button onClick={handleSave}>Salvar Senha</button>
+        </div>  
+
+      </div>
+    )}
+  </div>
+)}
 
 export default App;
