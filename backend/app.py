@@ -18,6 +18,18 @@ def ping():
 from flask import request
 from models import db, VaultEntry
 
+@app.route("/api/vault/<int:entry_id>", methods=["DELETE"])
+def delete_entry(entry_id):
+    entry = VaultEntry.query.get(entry_id)
+
+    if not entry:
+        return jsonify({"error": "Senha não encontrada"}), 404
+
+    db.session.delete(entry)
+    db.session.commit()
+
+    return jsonify({"message": "Senha deletada com sucesso"}), 200
+
 @app.route("/api/vault", methods=["GET"])
 def list_entries():
     entries = VaultEntry.query.all()

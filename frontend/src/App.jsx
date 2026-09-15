@@ -107,6 +107,20 @@ async function loadEntries() {
   setEntries(decrypted);
 }
 
+async function handleDelete(id) {
+  const confirmed = confirm("Tem certeza que deseja deletar esta senha?");
+  if (!confirmed) return;
+
+  const response = await fetch(`http://127.0.0.1:5000/api/vault/${id}`, {
+    method: "DELETE",
+  });
+
+  if (response.ok) {
+    loadEntries();
+  } else {
+    alert("Erro ao deletar a senha");
+  }
+}
 
 return (
   <div>
@@ -211,6 +225,7 @@ return (
             <strong>{entry.site}</strong>
             {entry.username && <span> - {entry.username}</span>}
             <p>{entry.password}</p>
+            <button onClick={() => handleDelete(entry.id)}>Apagar</button>
           </div>
         ))}
       </div>
